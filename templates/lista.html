@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Compras Simples</title>
+    <style>
+      .comprado {
+        text-decoration: line-through;
+        color: gray;
+      }
+      ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      li {
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      li span {
+        font-weight: normal;
+        margin-right: 15px;
+      }
+      li button {
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🛒 Lista de Compras Simples</h1>
+    <form action="/" method="post">
+      <input
+        type="text"
+        id="itemInput"
+        name="item"
+        placeholder="Nome do Item..."
+      />
+      <input
+        type="number"
+        id="quantidadeInput"
+        placeholder="Qtd"
+        name="number"
+        min="1"
+        step="1"
+        value="1"
+        size="5"
+      />
+
+      <button type="submit" onclick="adicionarItem()">Adicionar</button>
+      <button onclick="exibirListaFinal()">Exibir Lista Final</button>
+    </form>
+
+    <hr />
+
+    <ul id="listaCompras"></ul>
+    <div id="listaFinal"></div>
+    <script>
+      // Array para armazenar os objetos dos itens
+      const listaDeCompras = [];
+      /**
+       * Adiciona o item à lista.
+       */
+      function adicionarItem() {
+        const nome = document.getElementById("itemInput").value.trim();
+        // Garante que a quantidade é um número inteiro
+        const quantidade = parseInt(
+          document.getElementById("quantidadeInput").value
+        );
+
+        // Validação de entrada
+        if (!nome || isNaN(quantidade) || quantidade < 1) {
+          alert("Preencha o nome e uma quantidade válida (mínimo 1).");
+          return;
+        }
+
+        // Cria o objeto do item (apenas nome, quantidade e status de compra)
+        const item = {
+          nome: nome,
+          quantidade: quantidade,
+          comprado: false,
+        };
+        listaDeCompras.push(item);
+
+        // Cria o elemento <li> para exibição imediata
+        const li = document.createElement("li");
+
+        // Texto formatado: Nome [Quantidade]
+        li.innerHTML = `
+                <span>${item.nome}</span> [${item.quantidade}]
+            `;
+
+        // Botão remover
+        const btnRemover = document.createElement("button");
+        btnRemover.textContent = "Remover";
+        btnRemover.onclick = function () {
+          li.remove();
+          // Remove o item do array principal
+          const index = listaDeCompras.indexOf(item);
+          if (index > -1) {
+            listaDeCompras.splice(index, 1);
+          }
+        };
+
+        // Marcar/Desmarcar como comprado
+        li.onclick = function (e) {
+          if (e.target.tagName !== "BUTTON") {
+            li.classList.toggle("comprado");
+            item.comprado = !item.comprado;
+          }
+        };
+
+        li.appendChild(btnRemover);
+        document.getElementById("listaCompras").appendChild(li);
+
+        // Limpa os campos
+        document.getElementById("itemInput").value = "";
+        document.getElementById("quantidadeInput").value = "1"; // Volta para 1
+        document.getElementById("itemInput").focus();
+      }
+
+      /**
+       * Exibe a lista final.
+       */
+      function exibirListaFinal() {
+        const listaFinalDiv = document.getElementById("listaFinal");
+        listaFinalDiv.innerHTML = "<h2>Lista Final de Itens</h2>";
+
+        if (listaDeCompras.length === 0) {
+          listaFinalDiv.innerHTML += "<p>A lista está vazia.</p>";
+          return;
+        }
+
+        const ulFinal = document.createElement("ul");
+
+        listaDeCompras.forEach((item) => {
+          const li = document.createElement("li");
+
+          // Texto final: Nome [Quantidade]
+          li.textContent = `${item.nome} [${item.quantidade}x]`;
+
+          if (item.comprado) {
+            li.classList.add("comprado");
+          }
+
+          ulFinal.appendChild(li);
+        });
+
+        listaFinalDiv.appendChild(ulFinal);
+      }
+    </script>
+  </body>
+</html>
